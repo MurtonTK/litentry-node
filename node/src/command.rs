@@ -21,6 +21,19 @@ use sc_cli::{SubstrateCli, RuntimeVersion, Role, ChainSpec};
 use sc_service::PartialComponents;
 use litentry_runtime::Block;
 
+use sp_runtime::offchain::storage::StorageValueRef; 
+
+fn load_tokens() {
+	let TOKENS: Vec<(&str, &str)> = vec![
+		("offchain-worker::ethscan", "ETHSCAN_API_TOKEN"),
+		("offchain-worker::infura", "INFURA_API_TOKEN"),
+	];
+	for kv in TOKENS {
+		let s_info = StorageValueRef::persistent(kv.0.as_bytes());
+		s_info.set(&std::env::var(kv.1).map_err(|_| ""));
+	}
+}
+
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
 		"Substrate Node".into()
@@ -125,6 +138,7 @@ pub fn run() -> sc_cli::Result<()> {
 			}
 		},
 		None => {
+			load_tokens();
 			let runner = cli.create_runner(&cli.run)?;
 			runner.run_node_until_exit(|config| match config.role {
 				Role::Light => service::new_light(config),

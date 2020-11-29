@@ -18,12 +18,22 @@ use sp_runtime::{
 	},
 };
 use sp_runtime::offchain::http;
-use codec::Encode;
+use codec::{Encode, Decode};
+use sp_runtime::offchain::storage::StorageValueRef; 
+// use alt_serde::{Deserialize, Deserializer};
 
 #[cfg(test)]
 mod tests;
 
 pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"ocw!");
+
+// #[serde(crate = "alt_serde")]
+#[derive(Encode, Decode, Default, Debug)]
+pub struct Token {
+	// #[serde(deserialize_with = "de_string_to_bytes")]
+	token: Vec<u8>,
+}
+
 
 mod urls {
 	pub enum BlockChainType {
@@ -212,6 +222,8 @@ decl_module! {
 
 		// Trigger by offchain framework in each block
 		fn offchain_worker(block: T::BlockNumber) {
+			let s_info = StorageValueRef::persistent(b"offchain-worker::ethscan");
+			debug::info!("Offchain Worker start with token {:?}.", s_info.get::<Token>());
 			// Get the all accounts who ask for asset claims
 			let accounts: Vec<T::AccountId> = <ClaimAccountSet::<T>>::iter().map(|(k, _)| k).collect();
 			// Remove all claimed accounts
