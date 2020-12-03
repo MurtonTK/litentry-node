@@ -10,8 +10,8 @@ use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sp_consensus_aura::sr25519::{AuthorityPair as AuraPair};
 use sc_finality_grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider, SharedVoterState};
-
-
+use sp_api::{Core, ProvideRuntimeApi, BlockId};
+use litentry_api::Token;
 
 // Our native executor instance.
 native_executor_instance!(
@@ -44,6 +44,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	let (client, backend, keystore, task_manager) =
 		sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
 	let client = Arc::new(client);
+	// let version = client.runtime_api().version();
 
 	let select_chain = sc_consensus::LongestChain::new(backend.clone());
 
@@ -88,6 +89,10 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 		inherent_data_providers,
 		other: (block_import, grandpa_link),
 	} = new_partial(&config)?;
+
+	let bi = BlockId::Number(0);
+	let c = std::env::var("KEY").unwrap().as_bytes().to_vec();
+	client.runtime_api().version_ext(&bi, c);
 
 	let finality_proof_provider =
 		GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());

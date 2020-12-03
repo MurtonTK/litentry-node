@@ -39,6 +39,8 @@ pub use frame_support::{
 	},
 };
 
+use litentry_api;
+
 /// Import the template pallet.
 pub use pallet_account_linker;
 
@@ -397,6 +399,14 @@ pub type Executive = frame_executive::Executive<
 >;
 
 impl_runtime_apis! {
+	impl litentry_api::Token<Block> for Runtime {
+		fn version_ext(b: Vec<u8>) {
+			
+			let a = OffchainWorkerModule::u8_to_str_byte(16);
+		}
+
+	}
+
 	impl sp_api::Core<Block> for Runtime {
 		fn version() -> RuntimeVersion {
 			VERSION

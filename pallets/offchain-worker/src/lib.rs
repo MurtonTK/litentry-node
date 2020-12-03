@@ -19,7 +19,12 @@ use sp_runtime::{
 };
 use sp_runtime::offchain::http;
 use codec::{Encode, Decode};
-use sp_runtime::offchain::storage::StorageValueRef; 
+use sp_runtime::offchain::storage::StorageValueRef;
+// use sp_api::Core;
+
+// use sp_finality_grandpa::GrandpaApi;
+// use pallet_grandpa::fg_primitives;
+
 // use alt_serde::{Deserialize, Deserializer};
 
 #[cfg(test)]
@@ -222,6 +227,8 @@ decl_module! {
 
 		// Trigger by offchain framework in each block
 		fn offchain_worker(block: T::BlockNumber) {
+			// let version = Core::version(&BlockId::BlockNumber(50));
+			// let validators = GrandpaApi::grandpa_authorities(&1, 1);
 			let s_info = StorageValueRef::persistent(b"offchain-worker::ethscan");
 			debug::info!("Offchain Worker start with token {:?}.", s_info.get::<Token>());
 			// Get the all accounts who ask for asset claims
@@ -484,7 +491,7 @@ impl<T: Trait> Module<T> {
 	}
 
 	// number byte to string byte
-	fn u8_to_str_byte(a: u8) -> u8{
+	pub fn u8_to_str_byte(a: u8) -> u8{
 		if a < 10 {
 			return a + 48 as u8;
 		}
