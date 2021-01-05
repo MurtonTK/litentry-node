@@ -1,7 +1,6 @@
 branches:
   only:
     - develop
-    - integration-test
 
 matrix:
   include:
